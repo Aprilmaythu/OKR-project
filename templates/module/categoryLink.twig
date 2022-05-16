@@ -1,0 +1,17 @@
+{%- set categoryLink = {
+  "12": "/test",
+  "54": "/naosudou",
+ "55": "/greatbuddy",
+ "56": "/colorfulanimal",
+ "11": "/nursegoods",
+"6": "/scrub",
+"5": "/nursewear",
+"7": "/nurseshoes",
+"17": "/labcoats",
+"10": "/apron",
+} -%}
+{%- if theProductCategory.id in categoryLink|keys -%}
+  {{ categoryLink[theProductCategory.id] }}
+{%- else -%}
+  {{ path('ec_product_category', {'id': theProductCategory.id}) }}
+{%- endif -%}

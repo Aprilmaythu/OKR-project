@@ -1,0 +1,170 @@
+{% set dispNum = system_config('product_disp_num') %}
+{% set currentDispNum = app.request.get('disp_number') %}
+{% set currentOrderBy = app.request.get('orderby') %}
+{% set orderby = currentOrderBy %}
+{% set orderbyItem = "p.released_at" %}
+{% set orderbyCondition = "desc" %}
+{% if orderby == "sort_price_high" %}
+  {% set orderbyItem = "ps.price" %}
+  {% set orderbyCondition = "desc" %}
+{% elseif orderby == "sort_price_low" %}
+  {% set orderbyItem = "ps.price" %}
+  {% set orderbyCondition = "asc" %}
+{% endif %}
+
+{%- set page = app.request.get('page') ? app.request.get('page') : 1 -%}
+{%- set limit = dispNum -%}
+{% set qb = get_entity_manager().getRepository('EcCoreBundle:Product').createQueryBuilder('p').leftJoin('p.categories', 'c').leftJoin('p.product_sku', 'ps') %}
+{% set totalProducts = qb
+  .where('p.deleted_at is NULL')
+  .andWhere('p.available_before IS NULL OR p.available_before >= NOW()')
+  .andWhere('p.released_at <= NOW()').andWhere('p.release_status != 1')
+  .andWhere('c.id = :id')
+    .orderBy(orderbyItem, orderbyCondition)
+    .setParameter('id', category.id)
+      .getQuery().getResult() %}
+{% set totalProductsCount = totalProducts|length %}
+{% set maxPages = (totalProductsCount / limit)|round(0, 'ceil')  %}
+{%- set theProductCategory = category -%}
+{%- set theProducts = totalProducts|slice(limit * (page - 1), limit) -%}
+
+<div class="archiveController"> 
+  <p class="archiveController__top">顯示{% if totalProductsCount != 0 %}{{ (page - 1) * limit + 1 }}{% else %}{{ (page - 1) * limit}}{% endif %} - {% if (page * limit > totalProductsCount) %}{{ totalProductsCount }}{% else %}{{ page * limit }}{% endif %}  / 共{{ totalProductsCount }}件 {{ category_name }}商品</p>
+  <div class="archiveController__bottom"> 
+      
+    <p class="archiveController__pagination">
+      {%- if (maxPages > 1) -%}
+        {%- set firstPagerPage = (maxPages > 5) and (page > 3) ?page - 2 : 1 -%}
+        {%- if page != 1 -%}
+          <a href="{% TemplateInclude "categoryLink" %}?orderby={{ orderby }}&amp;disp_number={{ limit }}" class="first">≪</a>
+          <a href="{% TemplateInclude "categoryLink" %}?orderby={{ orderby }}&amp;disp_number={{ limit }}&amp;page={{ page - 1 }}" class="prev"></a>
+        {%- endif -%}
+        {%- if firstPagerPage != 1 -%}
+          <div class="pagination__item">...</div>
+        {%- endif -%}
+        {%- for pagerPage in firstPagerPage..(firstPagerPage + 4) -%}
+          {% if pagerPage == page %}
+            <a class="current" href="">{{ pagerPage }}</a>
+          {% else %}
+            {%- if pagerPage <= maxPages -%}
+              <a href="{% TemplateInclude "categoryLink" %}?orderby={{ orderby }}&amp;disp_number={{ limit }}&amp;page={{ pagerPage }}">{{ pagerPage }}</a>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- if maxPages > (firstPagerPage + 4) -%}
+          <span class="pagination__item">...</span>
+        {%- endif -%}
+        {%- if page != maxPages -%}
+          <a href="{% TemplateInclude "categoryLink" %}?orderby={{ orderby }}&amp;disp_number={{ limit }}&amp;page={{ page + 1 }}" class="next"></a>
+          <a href="{% TemplateInclude "categoryLink" %}?orderby={{ orderby }}&amp;disp_number={{ limit }}&amp;page={{ maxPages }}" class="last">≫</a>
+        {%- endif -%}
+      {% endif %}
+    </p>
+    <form id="from_product_list">
+      <div class="archiveController__btn"> 
+        <button value="sort_new" class="js-lc--orderBy" name="orderby">按新到</button>
+        <button value="sort_price_high" class="js-lc--orderBy" name="orderby">按價格高</button>
+        <button value="sort_price_low" class="js-lc--orderBy" name="orderby">按價格低</button>
+      </div>
+      <script>
+        $(function () {
+          let orderBy = '{{ currentOrderBy }}';
+          if (orderBy == '') {
+            $('.js-lc--orderBy[value="sort_new"]').addClass('current');
+          } else {
+            $('.js-lc--orderBy[value="{{ currentOrderBy }}"]').addClass('current');
+          }
+          $('.js-lc--orderBy').on('click', function () {
+            $('.js-lc--orderBya').removeClass('current');
+            $(this).addClass('current');
+            $('#form_product_list').submit();
+          });
+        });
+      </script>
+    </form>
+  </div>
+</div>
+
+<div class="products--archive">
+  <ul class="products">
+    {%- for theProduct in theProducts -%}
+      {%- set theProductSkus = get_entity_manager().getRepository('EcCoreBundle:ProductSku').createQueryBuilder('ps').innerJoin('ps.product', 'p').where(' p.id = :id').setParameter('id', theProduct.id).getQuery().getResult() -%}
+      {%- set productAvailable = false -%}
+      {%- set isMultiplePrices = false -%}
+
+      {# confirm the stock and the min price in sku #}
+      {%- set minPrice = (theProductSkus|first).price -%}
+      {%- for theProductSku in theProductSkus -%}
+        {%- if (theProductSku.getStockUnlimited or (theProductSku.getStock > 0)) -%}
+          {%- set productAvailable = true -%}
+          {%- if minPrice == 0 -%}
+            {%- set minPrice = theProductSku.price -%}
+          {%- else -%}
+            {%- if (theProductSku.price != minPrice) -%}
+              {%- set isMultiplePrices = true -%}
+              {%- if (theProductSku.price < minPrice) -%}
+                {%- set minPrice = theProductSku.price -%}
+              {%- endif -%}
+            {%- endif -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- set productName = theProduct.attribute('product name', language) ? theProduct.attribute('product name', language) : theProduct.name -%}
+      <li class="products__item">
+        <a class="products__box" href="{{ path('ec_product_detail', {'id': theProduct.id}) }}">
+          {%- set theProductCategories = theProduct.categories -%}
+          {%- for theProductCategory in theProductCategories -%}
+            {%- if theProductCategory.id == 100  -%}
+              <div class="newIcon">NEW</div>
+            {%- endif -%}
+          {%- endfor -%}
+          <figure class="products__figure"><img src="{% if theProduct.attribute('image1') %}{{ ('/uploads/media/'~get_entity_manager().find('MediaCoreBundle:Media', theProduct.attribute('image1')).path) }}{% else %}{{ asset("assets/img/no-image.png") }}{% endif %}" alt="product image"/></figure>
+        {#   {% TemplateInclude "categoryIcons" %} #}
+          <h3 class="products__name">{{ productName }}</h3>
+          <p class="products__price">
+            {% if theProduct.attribute('標準価格') %}<del>{{ #unitFront# }}{{ theProduct.attribute('標準価格')|price_format }}{{ #unitBack# }}</del><em>{% endif %}{{ #unitFront# }}{{ minPrice|price_format }}{{ #unitBack# }}{% if isMultiplePrices %}〜{% endif %}{% if theProduct.attribute('標準価格') %}</em>{% endif %}
+          </p>
+        </a>
+         <p class="productActoins">
+          {%- if productAvailable -%}
+            <button class="productActoins__cartin js-addToCart" type="button" data-id="{{ theProduct.id }}">{{ #cartin_label# }}</button>
+          {%- else -%}
+            <button class="productActoins__cartin" type="button" disabled>Sold Out</button>
+          {%- endif -%}
+          <button class="productActoins__favorite js-lc--favorite" type="button" title="favorite" data-product-id="{{ theProduct.id }}"></button>
+        </p> 
+      </li>
+    {%- endfor -%}
+  </ul>
+</div>
+      
+{%- if (maxPages > 1) -%}
+  <div class="archiveController"> 
+    <p class="archiveController__pagination">
+      {%- set firstPagerPage = (maxPages > 5) and (page > 3) ?page - 2 : 1 -%}
+      {%- if page != 1 -%}
+        <a href="{% TemplateInclude "categoryLink" %}?orderby={{ orderby }}&amp;disp_number={{ limit }}" class="first">≪</a>
+        <a href="{% TemplateInclude "categoryLink" %}?orderby={{ orderby }}&amp;disp_number={{ limit }}&amp;page={{ page - 1 }}" class="prev"></a>
+      {%- endif -%}
+      {%- if firstPagerPage != 1 -%}
+        <div class="pagination__item">...</div>
+      {%- endif -%}
+      {%- for pagerPage in firstPagerPage..(firstPagerPage + 4) -%}
+        {% if pagerPage == page %}
+          <a class="current" href="">{{ pagerPage }}</a>
+        {% else %}
+          {%- if pagerPage <= maxPages -%}
+            <a href="{% TemplateInclude "categoryLink" %}?orderby={{ orderby }}&amp;disp_number={{ limit }}&amp;page={{ pagerPage }}">{{ pagerPage }}</a>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if maxPages > (firstPagerPage + 4) -%}
+        <span class="pagination__item">...</span>
+      {%- endif -%}
+      {%- if page != maxPages -%}
+        <a href="{% TemplateInclude "categoryLink" %}?orderby={{ orderby }}&amp;disp_number={{ limit }}&amp;page={{ page + 1 }}" class="next"></a>
+        <a href="{% TemplateInclude "categoryLink" %}?orderby={{ orderby }}&amp;disp_number={{ limit }}&amp;page={{ maxPages }}" class="last">≫</a>
+      {%- endif -%}
+    </p>
+  </div>
+{% endif %}

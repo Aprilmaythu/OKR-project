@@ -1,0 +1,114 @@
+<section class="section"> 
+  <h2 class="sectionTitle sectionTitle--center">
+    <span class="sectionTitle__heading">
+      <span class="sectionTitle__main">Categories</span>
+      <span class="sectionTitle__sub">分類導航</span>
+    </span>
+  </h2>
+  <div class="section__body"> 
+    <ul class="banners">
+    {#   <li class="banners__item">
+        {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', 5) -%}
+        <a class="banners__box" href="{% TemplateInclude "categoryLink" %}">
+          <figure class="banners__figure--noLine"><img src="/uploads/media/89c421991ee081f5a4bcc0423bb0c6f2cf900e4d.jpeg" alt="{% if theProductCategory.getTransAttribute(lang_id) %}{{ theProductCategory.getTransAttribute(lang_id) }}{% else %}{{ theProductCategory.name }}{% endif %}"/></figure>
+        </a>
+      </li>
+      <li class="banners__item">
+        {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', 6) -%}
+        <a class="banners__box" href="{% TemplateInclude "categoryLink" %}">
+          <figure class="banners__figure--noLine"><img src="/uploads/media/a6d4ae2bffe10a570226d74b04584d9c5363f181.jpeg" alt="{% if theProductCategory.getTransAttribute(lang_id) %}{{ theProductCategory.getTransAttribute(lang_id) }}{% else %}{{ theProductCategory.name }}{% endif %}"/></figure>
+        </a>
+      </li> 
+    
+      <li class="banners__item">
+        {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', 6) -%}
+        <a class="banners__box" href="{% TemplateInclude "categoryLink" %}">
+          <figure class="banners__figure--noLine"><img src="/uploads/media/8674e501967c6db32158f86750bd092fab46efb0.jpeg" alt="{% if theProductCategory.getTransAttribute(lang_id) %}{{ theProductCategory.getTransAttribute(lang_id) }}{% else %}{{ theProductCategory.name }}{% endif %}"/></figure>
+        </a>
+      </li>
+      <li class="banners__item">
+        {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', 5) -%}
+        <a class="banners__box" href="{% TemplateInclude "categoryLink" %}">
+          <figure class="banners__figure--noLine"><img src="/uploads/media/8674e501967c6db32158f86750bd092fab46efb0.jpeg" alt="{% if theProductCategory.getTransAttribute(lang_id) %}{{ theProductCategory.getTransAttribute(lang_id) }}{% else %}{{ theProductCategory.name }}{% endif %}"/></figure>
+        </a>
+      </li>#}
+     
+      <li class="banners__item">
+        {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', 9) -%}
+        <a class="banners__box" href="{% TemplateInclude "categoryLink" %}">
+          <figure class="banners__figure--noLine"><img src="/uploads/media/b62be13c6a68f9927634059ca6bd189fd629ba67.jpeg" alt="{% if theProductCategory.getTransAttribute(lang_id) %}{{ theProductCategory.getTransAttribute(lang_id) }}{% else %}{{ theProductCategory.name }}{% endif %}"/></figure>
+        </a>
+      </li>
+   {#   <li class="banners__item">
+        {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', 10) -%}
+        <a class="banners__box" href="{% TemplateInclude "categoryLink" %}">
+          <figure class="banners__figure--noLine"><img src="/uploads/media/d42449ba56be9a66da07ea7cd291438d8a93733e.jpeg" alt="{% if theProductCategory.getTransAttribute(lang_id) %}{{ theProductCategory.getTransAttribute(lang_id) }}{% else %}{{ theProductCategory.name }}{% endif %}"/></figure>
+        </a>
+      </li>
+      <li class="banners__item">
+        {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', 11) -%}
+        <a class="banners__box" href="{% TemplateInclude "categoryLink" %}">
+          <figure class="banners__figure--noLine"><img src="/uploads/media/6a69859630e988ae2b739a43ebf4c671c9da5447.jpeg" alt="{% if theProductCategory.getTransAttribute(lang_id) %}{{ theProductCategory.getTransAttribute(lang_id) }}{% else %}{{ theProductCategory.name }}{% endif %}"/></figure>
+        </a>
+      </li> #}
+      <li class="banners__item">
+        {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', 12) -%}
+        <a class="banners__box" href="{% TemplateInclude "categoryLink" %}">
+          <figure class="banners__figure--noLine"><img src="/uploads/media/89c421991ee081f5a4bcc0423bb0c6f2cf900e4d.jpeg" alt="{% if theProductCategory.getTransAttribute(lang_id) %}{{ theProductCategory.getTransAttribute(lang_id) }}{% else %}{{ theProductCategory.name }}{% endif %}"/></figure>
+        </a>
+      </li>
+     
+      
+    </ul>
+  </div>
+</section>
+<style>
+  .section {
+    padding: 80px 30px;
+}
+  .sectionTitle {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: end;
+    -ms-flex-align: end;
+    align-items: flex-end;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    max-width: 1180px;
+    padding-top: 25px;
+    margin: 0 auto 48px;
+    position: relative;
+    line-height: 1.22;
+}
+  .sectionTitle::before {
+    content: "";
+    width: 100px;
+    height: 1px;
+    background: #fe7183;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+  .section__body {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+  .section__body {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+  .banners {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+  .banners__item {
+    width: calc(25% - 19px);
+    margin-right: 18px;
+    margin-bottom: 25px;
+}
+</style>

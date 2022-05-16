@@ -1,0 +1,72 @@
+{%- set theProducts = get_entity_manager().getRepository('EcCoreBundle:Product').createQueryBuilder('p').where('p.id in (:ids)').setParameter('ids', rankingProductIds is defined ? rankingProductIds : defaultRankingProductIds).orderBy('field(p.id, :ids)').getQuery().getResult() -%}
+  <h2 class="lc-contentSection__title"> <span class="sectionTitle__heading"> <span class="sectionTitle__main">Ranking</span><span class="sectionTitle__sub">人氣排行榜</span></span></h2>
+    <ul class="productArchive">
+      {%- for theProduct in theProducts -%}
+        {%- set theProductSkus = get_entity_manager().getRepository('EcCoreBundle:ProductSku').createQueryBuilder('ps').innerJoin('ps.product', 'p').where(' p.id = :id').setParameter('id', theProduct.id).getQuery().getResult() -%}
+        {%- set productAvailable = false -%}
+        {%- set isMultiplePrices = false -%}
+
+        {# confirm the stock and the min price in sku #}
+        {%- set minPrice = (theProductSkus|first).price -%}
+        {%- for theProductSku in theProductSkus -%}
+          {%- if (theProductSku.getStockUnlimited or (theProductSku.getStock > 0)) -%}
+            {%- set productAvailable = true -%}
+            {%- if minPrice == 0 -%}
+              {%- set minPrice = theProductSku.price -%}
+            {%- else -%}
+              {%- if (theProductSku.price != minPrice) -%}
+                {%- set isMultiplePrices = true -%}
+                {%- if (theProductSku.price < minPrice) -%}
+                  {%- set minPrice = theProductSku.price -%}
+                {%- endif -%}
+              {%- endif -%}
+            {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- set productName = theProduct.attribute('product name', language) ? theProduct.attribute('product name', language) : theProduct.name -%}
+        <li class="productArchive__item">
+          <a class="products__box" href="{{ path('ec_product_detail', {'id': theProduct.id}) }}">
+            {%- set theProductCategories = theProduct.categories -%}
+            {%- for theProductCategory in theProductCategories -%}
+              {%- if theProductCategory.id == 100  -%}
+                <div class="newIcon">NEW</div>
+              {%- endif -%}
+            {%- endfor -%}
+            <div class="products__rank">{{ loop.index }}</div>
+            <figure class="productArchive__figure hasImg is-loaded"><img src="{% if theProduct.attribute('image1') %}{{ ('/uploads/media/'~get_entity_manager().find('MediaCoreBundle:Media', theProduct.attribute('image1')).path) }}{% else %}{{ asset("assets/img/no-image.png") }}{% endif %}" alt="product image"/></figure>
+            {% TemplateInclude "categoryIcons" %}
+            <h3 class="products__name">{{ productName }}</h3>
+            <p class="products__price">
+              {{ (productskus[defaultSkuNum].price * curRatio)|price_format(decimalPoint) }}{{ unitBack }}
+         {#     {% if theProduct.attribute('標準価格') %}<del>{{ #unitFront# }}{{ theProduct.attribute('標準価格')|price_format }}{{ #unitBack# }}</del><em>{% endif %}{{ #unitFront# }}{{ minPrice|price_format }}{{ #unitBack# }}{% if isMultiplePrices %}〜{% endif %}{% if theProduct.attribute('標準価格') %}</em>{% endif %} #}
+            </p>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ol>
+<style>
+  @media (max-width: 1280px)
+.lc-root .lc-contentSection {
+  margin:75px;
+  padding:0 !important;
+}
+  .productArchive__item:nth-child(1) .products__rank{
+    width: 45px;
+    background-image: url(https://nursery-global.com/assets/img/icons/ico_rank_1.svg);
+  }
+  .products__rank {
+    height: 28px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    overflow: hidden;
+    text-indent: 200%;
+    white-space: nowrap;
+    position: absolute;
+    left: 50%;
+    top: -8px;
+    -webkit-transform: translate(-50%,-100%);
+    transform: translate(-50%,-100%);
+}
+}
+</style>

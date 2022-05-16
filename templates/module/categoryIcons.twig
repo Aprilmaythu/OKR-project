@@ -1,0 +1,54 @@
+<ul class="productIcons">
+  {%- for theProductCategory in theProductCategories -%}
+    {%- if theProductCategory.root == 3  -%}
+      <li class="productIcons-item">{% if theProductCategorynewIcon.getTransAttribute(lang_id) %}{{ theProductCategory.getTransAttribute(lang_id) }}{% else %}{{ theProductCategory.name }}{% endif %}</li>
+    {%- endif -%}
+  {%- endfor -%}
+</ul>
+<style>
+.productIcons-item{
+  background: #bc8adb;
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1;
+  justify-content: center;
+  padding: 9px;
+  margin: 0px 10px 0px 0px;
+  float:left;
+}
+  .productIcons{
+    display:block;
+  }
+.productIcons__item {
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  min-width: 35px;
+  height: 18px;
+  padding: 0 2px;
+  margin-right: 7px;
+  margin-bottom: 7px;
+  background: #f58487;
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1;
+}
+.productIcons__item-- {
+  background: #bc8adb;
+}
+.productIcons__item--restock {
+  background: #eb85ba;
+}
+.productIcons__item--limited {
+  background: #f8b04c;
+}
+.productIcons__item--free {
+  background: #75beb0;
+}
+.productIcons__item--sale {
+  background: #ed5252;
+}
+</style>

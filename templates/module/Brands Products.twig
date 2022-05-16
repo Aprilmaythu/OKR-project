@@ -1,0 +1,46 @@
+<section class="section">
+  <h2 class="sectionTitle"> <span class="sectionTitle__heading"> <span class="sectionTitle__main">RECOMMEND</span><span class="sectionTitle__sub">特集</span></span></h2>
+  <div class="section__body"> 
+    <ul class="banners banners--3columns banners--sp1column banners--slider"> 
+     
+      <li class="banners__item">
+        {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', 14) -%}
+        <a class="banners__box" href="{% TemplateInclude "categoryLink" %}" onclick="gtag('event', 'click', { 'top_rebomend_naoudou');">
+          <figure class="banners__figure"><img src="/uploads/media/8674e501967c6db32158f86750bd092fab46efb0.jpeg" alt="naoudou"/></figure>
+        </a>
+      </li>
+      <li class="banners__item">
+        {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', 13) -%}
+        <a class="banners__box" href="{% TemplateInclude "categoryLink" %}" onclick="gtag('event', 'click', { 'top_rebomend_goods');">
+          <figure class="banners__figure"><img src="/uploads/media/89c421991ee081f5a4bcc0423bb0c6f2cf900e4d.jpeg" alt="goods"/></figure>
+        </a>
+      </li>
+    {#   <li class="banners__item">
+        {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', 6) -%}
+        <a class="banners__box" href="{% TemplateInclude "categoryLink" %}" onclick="gtag('event', 'click', { 'top_rebomend_scrub');">
+          <figure class="banners__figure"><img src="/uploads/media/841e9f526cfb80c51cc1e5eb8a3f58ccdb6eebc1.jpeg" alt="scrub"/></figure>
+        </a>
+      </li>
+       <li class="banners__item">
+        {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', 55) -%}
+        <a class="banners__box" href="{% TemplateInclude "categoryLink" %}" onclick="gtag('event', 'click', { 'top_rebomend_greatbuddy');">
+          <figure class="banners__figure"><img src="/uploads/media/0c62c758cba624d26dd0a6edd51be55af62d17c5.jpeg" alt="greatbuddy"/></figure>
+        </a>
+      </li>
+     
+     
+    {#  <li class="banners__item">
+        {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', 10) -%}
+        <a class="banners__box" href="{% TemplateInclude "categoryLink" %}" onclick="gtag('event', 'click', { 'top_rebomend_aprone');">
+          <figure class="banners__figure"><img src="/uploads/media/8f769404fc7a1754d0e5d3bee3045c02a1f8bf28.jpeg" alt="aprone"/></figure>
+        </a>
+      </li> #}
+      <!-- <li class="banners__item">
+        {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', 5) -%}
+        <a class="banners__box" href="{% TemplateInclude "categoryLink" %}">
+          <figure class="banners__figure"><img src="/uploads/media/761e92dedb0878cd50799e8b869c02fd5b5731f3.jpeg" alt="brand name"/></figure>
+        </a>
+      </li>-->
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,118 @@
+<div class="leftContents">
+  <aside class="sidebar only-pc">
+    <div class="filter byCategory">
+      <h3 class="filter__title">按分類篩選</h3>
+      <ul class="filter__list">
+        {%- for theProductCategoryId in navCategories -%}
+          {%- set theProductCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', theProductCategoryId) -%}
+          {%- if theProductCategory -%}
+            <li class="filter__item"><a href="{% TemplateInclude "categoryLink" %}">{% if theProductCategory.getTransAttribute(lang_id) %}{{ theProductCategory.getTransAttribute(lang_id) }}{% else %}{{ theProductCategory.name }}{% endif %}</a></li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    </div>
+    <div class="filter byBrand">
+      <h3 class="filter__title">按品牌篩選</h3>
+      <ul class="filter__list">
+        {%- set parent = get_entity_manager().find('EcCoreBundle:ProductCategory', 2) -%}
+        {%- set qb = get_entity_manager().getRepository('EcCoreBundle:ProductCategory').createQueryBuilder('c') -%}
+        {%- set categories = qb.where('c.root = :root').andWhere('c.lft > :lft').andWhere('c.rgt < :rgt').orderBy('c.lft', 'ASC').setParameter('lft',  parent.lft).setParameter('rgt',  parent.rgt).setParameter('root',  parent.id).getQuery().getResult() -%}
+        {% for theProductCategory in categories %}
+          <li class="filter__item"><a href='{% TemplateInclude "categoryLink" %}'>
+          {% if theProductCategory.getTransAttribute(lang_id) %}{{ theProductCategory.getTransAttribute(lang_id) }}{% else %}{{ theProductCategory.name }}{% endif %}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="filter byColor">
+      <h3 class="filter__title">按顏色篩選</h3>
+      <ul class="filter__list">
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 1}) }}"> 
+            <div class="filter__color filter__color--white" title="WHITE"></div>
+          </a>
+        </li>
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 2}) }}"> 
+            <div class="filter__color filter__color--gray" title="GRAY"></div>
+          </a>
+        </li>
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 3}) }}"> 
+            <div class="filter__color filter__color--black" title="BLACK"></div>
+          </a>
+        </li>
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 4}) }}"> 
+            <div class="filter__color filter__color--brown" title="BROWN"></div>
+          </a>
+        </li>
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 5}) }}"> 
+            <div class="filter__color filter__color--beige" title="BEIGE"></div>
+          </a>
+        </li>
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 6}) }}"> 
+            <div class="filter__color filter__color--green" title="GREEN"></div>
+          </a>
+        </li>
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 7}) }}"> 
+            <div class="filter__color filter__color--blue" title="BLUE"></div>
+          </a>
+        </li>
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 8}) }}"> 
+            <div class="filter__color filter__color--purple" title="PURPLE"></div>
+          </a>
+        </li>
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 9}) }}"> 
+            <div class="filter__color filter__color--yellow" title="YELLOW"></div>
+          </a>
+        </li>
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 10}) }}"> 
+            <div class="filter__color filter__color--pink" title="PINK"></div>
+          </a>
+        </li>
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 11}) }}"> 
+            <div class="filter__color filter__color--red" title="RED"></div>
+          </a>
+        </li>
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 12}) }}"> 
+            <div class="filter__color filter__color--orange" title="ORANGE"></div>
+          </a>
+        </li>
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 13}) }}"> 
+            <div class="filter__color filter__color--silver" title="SILVER"></div>
+          </a>
+        </li>
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 14}) }}"> 
+            <div class="filter__color filter__color--gold" title="GOLD"></div>
+          </a>
+        </li>
+        <li class="filter__item">
+          <a href="{{ path('ec_product_category', {'id': 15}) }}"> 
+            <div class="filter__color filter__color--others" title="OTHER"></div>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="banner-left"> 
+      <ul class="banner-left__list">
+        <li class="banner-left__item"><a href="https://www.nursery-global.com/about"> <img src="/assets/img/banner_aboutNursery.png" alt=""/></a></li>
+        <li class="banner-left__item"> <a href="https://www.nursery-global.com/shop"> <img src="/assets/img/banner_shopInfo.png" alt=""/></a></li>
+      </ul>
+    </div>
+  {#  <dl class="snsLinks"> 
+      <dt class="snsLinks__title"><span>官方SNS</span></dt>
+      <dd class="snsLinks__detail"><a class="snsLinks__item u-icon--snsFacebook" href="https://www.facebook.com/NurseryTaiwan/" target="_blank"><span>facebook</span></a><a class="snsLinks__item u-icon--snsInstagram" href="https://www.instagram.com/nursery_net/" target="_blank"><span>instagram</span></a><a class="snsLinks__item u-icon--snsYoutube" href="https://www.youtube.com/channel/UC0OAzdz1yLgszrU97jDH4gw" target="_blank"><span>youtube</span></a><a class="snsLinks__item u-icon--snsLine" href="https://lin.ee/0BMpkme" target="_blank"><span>line</span></a></dd>
+    </dl> #}
+  </aside>
+</div>

@@ -1,0 +1,318 @@
+{# ▼▼ ここからは触らないでください ▼▼ #}
+
+{%- set category = get_entity_manager().find('EcCoreBundle:ProductCategory', #category_id# ) -%}
+{%- set qb = get_entity_manager().getRepository('EcCoreBundle:ProductCategory').createQueryBuilder('c') -%}
+{%- set ancestors = qb.where('c.root = :root').andWhere('c.lft <= :lft').andWhere('c.rgt >= :rgt').orderBy('c.lft', 'ASC').setParameter('lft',  category.lft).setParameter('rgt',  category.rgt).setParameter('root',  category.root).getQuery().getResult() -%}
+{%- set language = language() -%}
+{%- set lang_id = language_id() -%}
+{%- set curRatio = cur_unit_ratio() -%}
+{%- set unitFront = unit_front() -%}
+{%- set unitBack =unit_back() -%}
+{%- set decimalPoint = system_config("decimal_place") -%}
+
+{# insert to html head title #}
+{%- set category_name = category.getTransAttribute(lang_id) ? category.getTransAttribute(lang_id) : category.name -%}
+{%- set title = category_name -%}
+{%- if (ancestors|length > 0) -%}
+  {%- for ancestor in ancestors -%}
+    {%- set title = title ~ ' | ' ~ ancestor.getTransAttribute(lang_id) ? ancestor.getTransAttribute(lang_id) : ancestor.name -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{# get base currency unit #}
+{%- set baseCurrency = get_entity_manager().find('EcCoreBundle:Currency', system_config('base_currency')) -%}
+{%- set baseUnitFront = baseCurrency.getBeforeUnit() -%}
+{%- set baseUnitBack = baseCurrency.getAfterUnit() -%}
+
+{# end Variables Setting #}
+
+{% TemplateInclude "header" %}
+
+{# Contents #}
+
+{# Breadcrumb list (this variable setting method is written in module template "breadcrumb list") #}
+{%- set breadcrumbList = [] -%}
+{%- if (ancestors|length > 0) -%}
+{%- for ancestorCategory in ancestors -%}
+  {%- set breadcrumbListItem = {
+      name: ancestorCategory.getTransAttribute(lang_id) ? ancestorCategory.getTransAttribute(lang_id) : ancestorCategory.name,
+      href: path('ec_product_category', {'id': ancestorCategory.id})
+  } -%}
+  {%- set breadcrumbList = breadcrumbList|merge([breadcrumbListItem]) -%}
+{%- endfor -%}
+{%- endif -%}
+{%- set breadcrumbListItem = {
+    name: category_name,
+    href: path('ec_product_category', {'id': category.id})
+  }
+-%}
+{%- set breadcrumbList = breadcrumbList|merge([breadcrumbListItem]) -%}
+{% TemplateInclude "breadcrumb list" %}
+
+<div class="l-archive">
+
+ {#  {% TemplateInclude "top banners" %} #}
+
+{# ▲▲ ここまでは触らないでください ▲▲ #}
+
+  {# メインビジュアル #}
+  <!--<header class="l-archive__top">
+    <div class="lead">
+      <figure class="lead__bg"><img src="/assets/img/archive_lead_bg.png" alt=""/></figure>
+      <div class="lead__txt">
+        <h2 class="lead__title">NURSE WEAR <span>護士服</span></h2>
+        <p class="lead__desc">医療現場で働く看護師・ドクターのために！<br/>素材や着心地、価格にもこだわった白衣・ナースウェアをそろえています。</p>
+      </div>
+    </div>
+  </header>-->
+
+  <div class="l-archive__main">
+
+    {% TemplateInclude "left contents" %}
+
+   <div class="mainContents">
+
+      {# バナー #}
+    <!--     <section class="customBlock">
+
+        {# 1列 #}
+        <div class="col col1">
+          <a href="#"> 
+            <figure><img src="/assets/img/dummy/col1.png" alt="イージーパンツ"/></figure>
+            <div class="prodInfo">
+              <p>イージーパンツ　1,760 JPY</p>
+              <div class="more"><span>查看商品詳情</span></div>
+            </div>
+          </a>
+        </div>
+
+        {# 2列 #}
+        <div class="col col2">
+          <a href="#"> 
+            <figure><img src="/assets/img/dummy/col1.png" alt="制菌・抗ピル レギュラー丈カーディガン"/></figure>
+            <div class="prodInfo">
+              <p>制菌・抗ピル レギュラー丈カーディガン<br>1,760 JPY</p>
+              <div class="more"><span>查看商品詳情</span></div>
+            </div>
+          </a>
+          <a href="#"> 
+            <figure><img src="/assets/img/dummy/col1.png" alt="制菌・抗ピル レギュラー丈カーディガン"/></figure>
+            <div class="prodInfo">
+              <p>制菌・抗ピル レギュラー丈カーディガン<br>1,760 JPY</p>
+              <div class="more"><span>查看商品詳情</span></div>
+            </div>
+          </a>
+        </div>
+
+        {# 3列 #}
+        <div class="col col3">
+          <a href="#"> 
+            <figure><img src="/assets/img/dummy/col3-01.png" alt=""/></figure>
+            <div class="prodInfo">
+              <p>カシミヤタッチカーディガン(ロング丈)<br>1,760 JPY</p>
+              <div class="more"> <span>查看商品詳情</span></div>
+            </div>
+          </a>
+          <a href="#"> 
+            <figure><img src="/assets/img/dummy/col3-01.png" alt=""/></figure>
+            <div class="prodInfo">
+              <p>カシミヤタッチカーディガン(ロング丈)<br>1,760 JPY</p>
+              <div class="more"><span>查看商品詳情</span></div>
+            </div>
+          </a>
+          <a href="#"> 
+            <figure><img src="/assets/img/dummy/col3-01.png" alt=""/></figure>
+            <div class="prodInfo">
+              <p>カシミヤタッチカーディガン(ロング丈)<br>1,760 JPY</p>
+              <div class="more"><span>查看商品詳情</span></div>
+            </div>
+          </a>
+        </div>
+
+      </section>-->
+
+     <!--     {% TemplateInclude "ranking" %}-->
+
+  {% TemplateInclude "productCategoryArchive" %}
+
+    </div>
+  </div>
+</div>
+
+{% TemplateInclude "Categories" %}
+{# end Contents #}
+
+{% TemplateInclude "footer" %}
+  <style>
+    .sidebar {
+    width: 200px;
+    margin-right: 68px;
+    position: sticky;
+    top: 180px;
+}
+    .mainContents {
+    max-width: 940px;
+}
+    .l-archive {
+     padding: 0px 60px;
+}
+    .l-archive__main {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+    .products {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin: 0 -16px;
+}
+    .products__item {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    width: 25%;
+    padding: 0 16px;
+    margin-bottom: 80px;
+    position: relative;
+}
+    .products__box {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-flex: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+    .products__figure {
+    margin-bottom: 20px;
+  /*  border: solid 4px #ffedf0; */
+}
+    .sidebar .filter__title {
+    font-size: 1.8rem;
+    background-color: #fd7728;
+    color: #fff;
+    padding: 4px 14px;
+}
+.sidebar .filter__list {
+    font-size: 1.6rem;
+    margin-bottom: 40px;
+    border-bottom: solid 2px #fd7728;
+}
+    .sidebar .filter.byBrand .filter__item, .sidebar .filter.byCategory .filter__item {
+    border-bottom: solid 0.5px #fd7728;
+}
+    .sidebar .filter.byBrand .filter__item a, .sidebar .filter.byCategory .filter__item a {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    padding: 6px 14px;
+}
+    .l-special .index>ol>li>ol>li a::before, .sidebar .filter.byBrand .filter__item a::after, .sidebar .filter.byCategory .filter__item a::after {
+    content: ">";
+}
+    .sidebar .filter.byColor .filter__item {
+    width: calc(20% - 16px);
+}
+    .sidebar .filter.byColor .filter__list {
+    padding: 24px 0;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    gap: 18.5px;
+}
+    .sidebar .filter__color {
+    width: 30px;
+    height: 30px;
+    position: relative;
+}
+    .sidebar .filter__color--white {
+    background-color: #fff;
+    outline: solid 1px #707070;
+    outline-offset: -1px;
+}
+    .sidebar .filter__color--gray {
+    background-color: #797979;
+}
+    .sidebar .filter__color--black {
+    background-color: #000;
+}
+    .sidebar .filter__color--brown {
+    background-color: #803d26;
+}
+    .sidebar .filter__color--beige {
+    background-color: #e6dab8;
+}
+    .sidebar .filter__color--green {
+    background-color: #2e994c;
+}
+    .sidebar .filter__color--blue {
+    background-color: #0060e6;
+}
+    .sidebar .filter__color--purple {
+    background-color: #5d0d80;
+}
+    .sidebar .filter__color--yellow {
+    background-color: #f5e431;
+}
+    .sidebar .filter__color--pink {
+    background-color: #f6b1d7;
+}
+    .sidebar .filter__color--red {
+    background-color: #db0028;
+}
+    .sidebar .filter__color--orange {
+    background-color: #ff9633;
+}
+    .productActoins {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    margin-top: 30px;
+    line-height: 1;
+    text-align: center;
+}
+    .productActoins__cartin {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    width: 170px;
+    max-width: 100%;
+    height: 35px;
+   border: solid 2px #fa7026;
+    background: #fa7026;
+    color: #fff;
+    -webkit-transition: .3s;
+    transition: .3s;
+}
+  </style>

@@ -1,0 +1,66 @@
+{%- set productCategory = get_entity_manager().find('EcCoreBundle:ProductCategory', productCategoryId) -%}
+{%- set qb = get_entity_manager().getRepository('EcCoreBundle:Product').createQueryBuilder('p').leftJoin('p.categories', 'c') -%}
+{%- set theProducts = qb.where('c.id = :id').andWhere('p.deleted_at is NULL').andWhere('p.available_before IS NULL OR p.available_before >= NOW()').andWhere('p.released_at <= NOW()').andWhere('p.release_status != 1').orderBy('p.released_at', 'desc').setMaxResults(productCategoryMaxResults).setParameter('id', productCategory.id).getQuery().getResult() -%}
+{% if (theProducts|length > 0) %}
+  <section class="section"> 
+    <h2 class="sectionTitle">
+      <span class="sectionTitle__heading">
+        <span class="sectionTitle__main">{% if productCategory.getTransAttribute(3) %}{{ productCategory.getTransAttribute(3) }}{% endif %}</span>
+        <span class="sectionTitle__sub">{% if productCategory.getTransAttribute(lang_id) %}{{ productCategory.getTransAttribute(lang_id) }}{% else %}{{ productCategory.name }}{% endif %}</span>
+      </span>
+      <a class="moreButton" href="{{ path('ec_product_category', {'id': productCategory.id}) }}"><i class="moreButton__icon">&gt;</i><span class="moreButton__text">SEE MORE</span></a>
+    </h2>
+    <div class="section__body"> 
+      <ul class="products">
+        {%- for theProduct in theProducts -%}
+          {%- set theProductSkus = get_entity_manager().getRepository('EcCoreBundle:ProductSku').createQueryBuilder('ps').innerJoin('ps.product', 'p').where(' p.id = :id').setParameter('id', theProduct.id).getQuery().getResult() -%}
+          {%- set productAvailable = false -%}
+          {%- set isMultiplePrices = false -%}
+
+          {# confirm the stock and the min price in sku #}
+          {%- set minPrice = (theProductSkus|first).price -%}
+          {%- for theProductSku in theProductSkus -%}
+            {%- if (theProductSku.getStockUnlimited or (theProductSku.getStock > 0)) -%}
+              {%- set productAvailable = true -%}
+              {%- if minPrice == 0 -%}
+                {%- set minPrice = theProductSku.price -%}
+              {%- else -%}
+                {%- if (theProductSku.price != minPrice) -%}
+                  {%- set isMultiplePrices = true -%}
+                  {%- if (theProductSku.price < minPrice) -%}
+                    {%- set minPrice = theProductSku.price -%}
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {%- set productName = theProduct.attribute('product name', language) ? theProduct.attribute('product name', language) : theProduct.name -%}
+          <li class="products__item">
+            <a class="products__box" href="{{ path('ec_product_detail', {'id': theProduct.id}) }}">
+              {%- set theProductCategories = theProduct.categories -%}
+              {%- for theProductCategory in theProductCategories -%}
+                {%- if theProductCategory.id == 100  -%}
+                  <div class="newIcon">NEW</div>
+                {%- endif -%}
+              {%- endfor -%}
+              <figure class="products__figure"><img src="{% if theProduct.attribute('image1') %}{{ ('/uploads/media/'~get_entity_manager().find('MediaCoreBundle:Media', theProduct.attribute('image1')).path) }}{% else %}{{ asset("assets/img/no-image.png") }}{% endif %}" alt="product image"/></figure>
+       {#       {% TemplateInclude "categoryIcons" %} #}
+              <h3 class="products__name">{{ productName }}</h3>
+              <p class="products__price">
+                {% if theProduct.attribute('標準価格') %}<del>{{ #unitFront# }}{{ theProduct.attribute('標準価格')|price_format }}{{ #unitBack# }}</del><em>{% endif %}{{ #unitFront# }}{{ minPrice|price_format }}{{ #unitBack# }}{% if isMultiplePrices %}〜{% endif %}{% if theProduct.attribute('標準価格') %}</em>{% endif %}
+              </p>
+            </a>
+            <p class="productActoins">
+              {%- if productAvailable -%}
+                <button class="productActoins__cartin js-addToCart" type="button" data-id="{{ theProduct.id }}">{{ #cartin_label# }}</button>
+              {%- else -%}
+                <button class="productActoins__cartin" type="button" disabled>Sold Out</button>
+              {%- endif -%}
+              <button class="productActoins__favorite js-lc--favorite" type="button" title="favorite" data-product-id="{{ theProduct.id }}"></button>
+            </p>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </section>
+{% endif %}
